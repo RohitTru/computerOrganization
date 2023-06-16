@@ -1,0 +1,23 @@
+I am doing good, thank you for asking and I hope the same for you as well.
+
+For lab 1 she gave us a a document explain what our goal is and Lab1.cpp file that serves as a template for us to use.
+
+The document explains how we need to take 4 (already defined variables) in the C++ file and send them to a register stack on the x86 processor of an intel chip using assembly language.
+
+C++ allows us to write low level assemble code to do this. In the document it explains to write assemble code within the curly braces that follow the “_asm” (which tell c++ we are going to be writing assembly”
+
+The template assigns 4 variables c1, c2, c3, c3. We are asked to move c1 through c4 to the stack in highest order to lowest.
+
+in assembly, you use the ‘mov’ operation to specify that you want to move something. You then follow that with where you want to move it, then followed by a comma and the variable name of what you are moving.
+
+so the first on would look like: mov AH, c1
+
+there are 4 variables and they each take up 8 bits. The highest bit register is 32 bits, so we want to fit all of them in that 32 bit register.
+
+Ill send you a chart of how the ordering goes, but basically the 8 bit (high) is AH, the 8 bit (low) is AL, then we have to shift everything to  make room for the next 2 8 bit variables. you can use sh1 followed by EAX which is the size of the 32 bit register followed by a comma and the number of bits you want to move which in this case 8+8 =16 (c1 bits + c2 bits)
+
+This looks something like this : sh1 EAX, 16
+
+Now that you moved everything you made room for the variables c3 and c4, which you just repeat what you did for c1 and c2.
+
+lastly, once you have sent c1 and c2 to the register, then shifted them, then sent c3 and c4 to the register, you assign everything to the “unsigned char i1” by using “mov EAX, i1”
