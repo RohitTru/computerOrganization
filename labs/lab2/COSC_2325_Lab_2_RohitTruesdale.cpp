@@ -10,6 +10,17 @@ void main ()
     unsigned char c4;
     unsigned long i1 (0xaabbccee);
     __asm {
+        mov eax,i1
+		mov c1,al
+		
+		shr EAX, 8
+		mov c2, al
+		
+		shr eax, 8
+        mov c3, al
+        
+        shr eax, 8
+        mov c4, al
         }
     cout.flags (ios::hex);
     cout << "results are " << (unsigned int) c1 << ", "
