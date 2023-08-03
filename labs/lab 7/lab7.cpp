@@ -51,44 +51,37 @@ _main:
    movl   $0, 72(%esp)
    movl   $1, 76(%esp)
 
-   movl   $0, 140(%esp) ; Initialize loop index variable to 0
+   movl   $0, %ecx ; Initialize loop index variable to 0
 
    jmp   L2 ; Jump to the loop start
 
 L4:
-   ; Load the current index from the loop variable into register eax
-   movl   140(%esp), %eax
-
-   ; Check if the current membership level at index eax is equal to 4
-   movl   80(%esp,%eax,4), %eax
+   ; Check if the current membership level at index ecx is equal to 4
+   movl   80(%esp, %ecx, 4), %eax
    cmpl   $4, %eax
    jne   L3 ; If not, jump to the end of the loop
 
-   ; Check if the current officer position at index eax is greater than 0 and less than 10
-   movl   140(%esp), %eax
-   movl   20(%esp,%eax,4), %eax
+   ; Check if the current officer position at index ecx is greater than 0 and less than 10
+   movl   20(%esp, %ecx, 4), %eax
    testl   %eax, %eax
    jle   L3 ; If not, jump to the end of the loop
-   movl   140(%esp), %eax
-   movl   20(%esp,%eax,4), %eax
    cmpl   $9, %eax
    jg   L3 ; If not, jump to the end of the loop
 
    ; If both conditions are met, print the current index (member number)
-   movl   140(%esp), %eax
-   addl   $1, %eax ; Increment the index (since member numbers start at zero)
-   movl   %eax, 4(%esp) ; Move the index into the argument for `printf`
+   addl   $1, %ecx ; Increment the loop index (since member numbers start at zero)
+   movl   %ecx, 4(%esp) ; Move the index into the argument for `printf`
    movl   $LC0, (%esp) ; Load the address of the format string into the argument for `printf`
    call   _printf ; Call the `printf` function to print the member number
 
 L3:
    ; Increment the loop index and jump back to the loop start
-   addl   $1, 140(%esp)
+   addl   $1, %ecx
    jmp   L2
 
 L2:
    ; Check if the loop index is less than or equal to 14 (15 members - 1 since it's zero-based)
-   cmpl   $14, 140(%esp)
+   cmpl   $14, %ecx
    jle   L4 ; If the condition is true, continue the loop
 
    nop ; No operation (just a placeholder)
