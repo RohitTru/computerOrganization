@@ -1,95 +1,91 @@
-.file   "assembly.c"
-.def   ___main;   .scl   2;   .type   32;   .endef
-.section .rdata,"dr"
-LC0:
-   .ascii "%d, \0" ; The format string for the `printf` function
+#include <iostream>
 
-.text
-.globl   _main
-.def   _main;   .scl   2;   .type   32;   .endef
+// Declaration of the assembly function
+extern "C" void printMembersWithCriteria();
 
-_main:
-   ; Function prologue - setting up the stack frame
-   pushl   %ebp
-   movl   %esp, %ebp
-   andl   $-16, %esp
-   subl   $144, %esp ; Allocating space for local variables on the stack
+int main()
+{
+    // Call the assembly function
+    printMembersWithCriteria();
 
-   call   ___main ; Call the startup code (equivalent to C's main function)
+    return 0;
+}
 
-   ; Initialize the memberLvl array with the given values
-   movl   $1, 80(%esp)
-   movl   $3, 84(%esp)
-   movl   $3, 88(%esp)
-   movl   $4, 92(%esp)
-   movl   $2, 96(%esp)
-   movl   $4, 100(%esp)
-   movl   $0, 104(%esp)
-   movl   $1, 108(%esp)
-   movl   $4, 112(%esp)
-   movl   $2, 116(%esp)
-   movl   $1, 120(%esp)
-   movl   $4, 124(%esp)
-   movl   $2, 128(%esp)
-   movl   $2, 132(%esp)
-   movl   $3, 136(%esp)
+// Assembly code implementation of the function
+__asm{
 
-   ; Initialize the officerList array with the given values
-   movl   $0, 20(%esp)
-   movl   $13, 24(%esp)
-   movl   $0, 28(%esp)
-   movl   $0, 32(%esp)
-   movl   $2, 36(%esp)
-   movl   $12, 40(%esp)
-   movl   $0, 44(%esp)
-   movl   $1, 48(%esp)
-   movl   $0, 52(%esp)
-   movl   $3, 56(%esp)
-   movl   $2, 60(%esp)
-   movl   $1, 64(%esp)
-   movl   $11, 68(%esp)
-   movl   $0, 72(%esp)
-   movl   $1, 76(%esp)
+    pushl   %ebp                   // Function prologue - save the old base pointer
+    movl   %esp, %ebp              // Set the new base pointer
 
-   movl   $0, %ecx ; Initialize loop index variable to 0
+    andl   $-16, %esp              // Align the stack pointer to a multiple of 16
+    subl   $144, %esp              // Allocate space on the stack for local variables
 
-   jmp   L2 ; Jump to the loop start
+    call   ___main                 // Call the startup code (equivalent to C's main function)
 
-L4:
-   ; Check if the current membership level at index ecx is equal to 4
-   movl   80(%esp, %ecx, 4), %eax
-   cmpl   $4, %eax
-   jne   L3 ; If not, jump to the end of the loop
+    // Initialize the arrays membershipLevels and officerPositions with the given values
+    movl   $1, 80(%esp)
+    movl   $3, 84(%esp)
+    movl   $3, 88(%esp)
+    movl   $4, 92(%esp)
+    movl   $2, 96(%esp)
+    movl   $4, 100(%esp)
+    movl   $0, 104(%esp)
+    movl   $1, 108(%esp)
+    movl   $4, 112(%esp)
+    movl   $2, 116(%esp)
+    movl   $1, 120(%esp)
+    movl   $4, 124(%esp)
+    movl   $2, 128(%esp)
+    movl   $2, 132(%esp)
+    movl   $3, 136(%esp)
+    
+    // Initialize the officerList array with the given values
+    movl   $0, 20(%esp)
+    movl   $13, 24(%esp)
+    movl   $0, 28(%esp)
+    movl   $0, 32(%esp)
+    movl   $2, 36(%esp)
+    movl   $12, 40(%esp)
+    movl   $0, 44(%esp)
+    movl   $1, 48(%esp)
+    movl   $0, 52(%esp)
+    movl   $3, 56(%esp)
+    movl   $2, 60(%esp)
+    movl   $1, 64(%esp)
+    movl   $11, 68(%esp)
+    movl   $0, 72(%esp)
+    movl   $1, 76(%esp)
+    movl   $0, 140(%esp)
+    jmp   L2
 
-   ; Check if the current officer position at index ecx is greater than 0 and less than 10
-   movl   20(%esp, %ecx, 4), %eax
-   testl   %eax, %eax
-   jle   L3 ; If not, jump to the end of the loop
-   cmpl   $9, %eax
-   jg   L3 ; If not, jump to the end of the loop
+    L4:
+    movl   140(%esp), %eax         // Load the loop index into eax
+    movl   80(%esp,%eax,4), %eax   // Load the current membership level into eax
+    cmpl   $4, %eax                // Compare with 4
+    jne   L3                       // If not equal, jump to the end of the loop
 
-   ; If both conditions are met, print the current index (member number)
-   addl   $1, %ecx ; Increment the loop index (since member numbers start at zero)
-   movl   %ecx, 4(%esp) ; Move the index into the argument for `printf`
-   movl   $LC0, (%esp) ; Load the address of the format string into the argument for `printf`
-   call   _printf ; Call the `printf` function to print the member number
+    movl   140(%esp), %eax         // Load the loop index into eax again
+    movl   20(%esp,%eax,4), %eax   // Load the current officer position into eax
+    testl   %eax, %eax             // Test if officer position is 0 (not an officer)
+    jle   L3                       // If less than or equal to 0, jump to the end of the loop
+    cmpl   $9, %eax                // Compare with 9
+    jg   L3                        // If greater than 9, jump to the end of the loop
 
-L3:
-   ; Increment the loop index and jump back to the loop start
-   addl   $1, %ecx
-   jmp   L2
+    // If the member meets the criteria, print the member number
+    movl   140(%esp), %eax         // Load the loop index into eax once again
+    addl   $1, %eax                // Increment eax by 1 (since member numbers start from 1)
+    movl   %eax, 4(%esp)           // Move the member number into the argument for printf
+    movl   $LC0, (%esp)            // Move the format string into the argument for printf
+    call   _printf                 // Call the printf function to print the member number
 
-L2:
-   ; Check if the loop index is less than or equal to 14 (15 members - 1 since it's zero-based)
-   cmpl   $14, %ecx
-   jle   L4 ; If the condition is true, continue the loop
+    L3:
+    addl   $1, 140(%esp)           // Increment the loop index
+    L2:
+    cmpl   $14, 140(%esp)          // Compare the loop index with 14
+    jle   L4                       // If less than or equal to 14, repeat the loop
 
-   nop ; No operation (just a placeholder)
-
-   ; Function epilogue - cleanup and return
-   leave
-   ret
-
-; The version of GCC used for compilation
-.ident   "GCC: (tdm-1) 5.1.0"
-.def   _printf;   .scl   2;   .type   32;   .endef
+    
+    leave                         // Function epilogue - clean up the stack frame
+    ret                            // Return from the function
+    
+};
