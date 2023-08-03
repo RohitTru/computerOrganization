@@ -1,8 +1,5 @@
 #include <iostream>
 
-// Declaration of the assembly function
-extern "C" void printMembersWithCriteria();
-
 int main()
 {
     // Call the assembly function
